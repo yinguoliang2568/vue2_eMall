@@ -1,7 +1,51 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <h2 class="all">全部商品分类</h2>
+      <div @mouseenter="mouseIsNav = true" @mouseleave="mouseIsNav = false">
+        <h2 class="all">全部商品分类</h2>
+        <div
+          class="sort"
+          @mouseenter="mouseInCategoryFlag = true"
+          @mouseleave="mouseInCategoryFlag = false"
+          v-show="isShow"
+        >
+          <div class="all-sort-list2" @mouseleave="mouseInCategoryIndex = -1">
+            <div
+              class="item"
+              v-for="(category1, index) in category1List"
+              :key="category1.id"
+              @mouseenter="getCategory23Throttle(category1.id, index)"
+              :class="{ active: mouseInCategoryIndex === index }"
+            >
+              <h3>
+                <a href="">{{ category1.name }}</a>
+              </h3>
+              <div class="item-list clearfix">
+                <div class="subitem">
+                  <dl
+                    class="fore"
+                    v-for="category2 in category1.children"
+                    :key="category2.id"
+                  >
+                    <dt>
+                      <a href="">{{ category2.name }}</a>
+                    </dt>
+                    <dd>
+                      <em
+                        v-for="category3 in category2.children"
+                        :key="category3.id"
+                      >
+                        <a href="">{{ category3.name }}</a>
+                      </em>
+                    </dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <nav class="nav">
         <a href="###">服装城</a>
         <a href="###">美妆馆</a>
@@ -12,47 +56,6 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
-      <div class="sort">
-        <div
-          class="all-sort-list2"
-          @mouseenter="mouseInCategoryFlag = true"
-          @mouseleave="mouseInCategoryFlag = false"
-        >
-          <div
-            class="item"
-            v-for="(category1, index) in category1List"
-            :key="category1.id"
-            @mouseenter="getCategory23Throttle(category1.id, index)"
-            @mouseleave="mouseInCategoryIndex = -1"
-            :class="{ active: mouseInCategoryIndex === index }"
-          >
-            <h3>
-              <a href="">{{ category1.name }}</a>
-            </h3>
-            <div class="item-list clearfix">
-              <div class="subitem">
-                <dl
-                  class="fore"
-                  v-for="category2 in category1.children"
-                  :key="category2.id"
-                >
-                  <dt>
-                    <a href="">{{ category2.name }}</a>
-                  </dt>
-                  <dd>
-                    <em
-                      v-for="category3 in category2.children"
-                      :key="category3.id"
-                    >
-                      <a href="">{{ category3.name }}</a>
-                    </em>
-                  </dd>
-                </dl>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -68,10 +71,16 @@
         mouseInCategoryIndex: -1,
         // 鼠标是否在三级分类列表中
         mouseInCategoryFlag: false,
+        // 是否在nav中
+        mouseIsNav: false,
       };
     },
     computed: {
       ...mapState("category", ["category1List"]),
+      isShow() {
+        if (this.$route.name === "Home") return true;
+        return this.mouseIsNav;
+      },
     },
     methods: {
       // 获取一级分类的数据

@@ -17,7 +17,6 @@
   import List from "./List";
   import Rank from "./Rank";
   import Recommend from "./Recommend";
-  import TypeNav from "./TypeNav";
   export default {
     name: "Home",
     components: {
@@ -27,7 +26,6 @@
       List,
       Rank,
       Recommend,
-      TypeNav,
     },
   };
 </script>
