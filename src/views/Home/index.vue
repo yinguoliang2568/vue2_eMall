@@ -5,7 +5,7 @@
     <Recommend></Recommend>
     <Rank></Rank>
     <Like></Like>
-    <Floor></Floor>
+    <Floor v-for="floor in floorList" :key="floor.id" :floor="floor"></Floor>
     <Brand></Brand>
   </div>
 </template>
@@ -17,8 +17,14 @@
   import List from "./List";
   import Rank from "./Rank";
   import Recommend from "./Recommend";
+  import { req_FloorList } from "@/api";
   export default {
     name: "Home",
+    data() {
+      return {
+        floorList: [],
+      };
+    },
     components: {
       Brand,
       Floor,
@@ -26,6 +32,15 @@
       List,
       Rank,
       Recommend,
+    },
+    methods: {
+      async getFloorList() {
+        const result = await req_FloorList();
+        this.floorList = result;
+      },
+    },
+    mounted() {
+      this.getFloorList();
     },
   };
 </script>

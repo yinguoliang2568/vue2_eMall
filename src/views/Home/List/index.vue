@@ -3,10 +3,14 @@
     <div class="sortList clearfix">
       <div class="center">
         <!--banner轮播-->
-        <div class="swiper-container" id="mySwiper">
+        <div class="swiper-container" ref="mySwiper">
           <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <img src="./images/banner1.jpg" />
+            <div
+              class="swiper-slide"
+              v-for="banner in bannerList"
+              :key="banner.id"
+            >
+              <img :src="banner.imgUrl" />
             </div>
           </div>
           <!-- 如果需要分页器 -->
@@ -91,8 +95,52 @@
 </template>
 
 <script>
+  import { req_BannerList } from "@/api";
+  import Swiper from "swiper";
+  import "swiper/css/swiper.min.css";
   export default {
     name: "List",
+    data() {
+      return {
+        bannerList: [],
+      };
+    },
+    methods: {
+      async getBannerList() {
+        const result = await req_BannerList();
+        this.bannerList = result;
+      },
+    },
+    mounted() {
+      this.getBannerList();
+    },
+    watch: {
+      bannerList: {
+        immediate: true,
+        handler() {
+          // 在$nextTick的回调函数中进行轮播图的用
+          this.$nextTick(() => {
+            // 第一个参数，需要监听轮播图的区域，迭戈参数:配置选项
+            new Swiper(this.$refs.mySwiper, {
+              // 是否烤漆循环
+              loop: true,
+
+              // 手否开启分页器
+              pagination: {
+                // 分页的容器
+                el: ".swiper-pagination",
+              },
+
+              // 前进后后退
+              navigation: {
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+              },
+            });
+          });
+        },
+      },
+    },
   };
 </script>
 

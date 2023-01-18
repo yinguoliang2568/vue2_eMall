@@ -2,7 +2,7 @@
   <div class="floor">
     <div class="py-container">
       <div class="title clearfix">
-        <h3 class="fl">家用电器</h3>
+        <h3 class="fl">{{ floor.name }}</h3>
         <div class="fr">
           <ul class="nav-tabs clearfix">
             <li class="active">
@@ -89,6 +89,8 @@
 <script>
   export default {
     name: "Floor",
+    // 利用props来获取父元素传来 的floor数据
+    props: ["floor"],
   };
 </script>
 
