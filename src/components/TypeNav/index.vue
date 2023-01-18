@@ -16,9 +16,14 @@
               :key="category1.id"
               @mouseenter="getCategory23Throttle(category1.id, index)"
               :class="{ active: mouseInCategoryIndex === index }"
+              @click="toSearch"
             >
               <h3>
-                <a href="">{{ category1.name }}</a>
+                <a
+                  :data-category1id="category1.id"
+                  :data-categoryname="category1.name"
+                  >{{ category1.name }}</a
+                >
               </h3>
               <div class="item-list clearfix">
                 <div class="subitem">
@@ -28,14 +33,22 @@
                     :key="category2.id"
                   >
                     <dt>
-                      <a href="">{{ category2.name }}</a>
+                      <a
+                        :data-category2id="category2.id"
+                        :data-categoryname="category2.name"
+                        >{{ category2.name }}</a
+                      >
                     </dt>
                     <dd>
                       <em
                         v-for="category3 in category2.children"
                         :key="category3.id"
                       >
-                        <a href="">{{ category3.name }}</a>
+                        <a
+                          :data-category3id="category3.id"
+                          :data-categoryname="category3.name"
+                          >{{ category3.name }}</a
+                        >
                       </em>
                     </dd>
                   </dl>
@@ -94,6 +107,21 @@
       },
       // 节流函数占位，起到一个响应式的作用
       getCategory23Throttle() {},
+
+      // 跳转
+      toSearch(e) {
+        const { category1id, category2id, category3id, categoryname } =
+          e.target.dataset;
+        this.$router.push({
+          name: "Search",
+          query: {
+            category1id,
+            category2id,
+            category3id,
+            categoryname,
+          },
+        });
+      },
     },
     mounted() {
       // 获取一级分类的数据

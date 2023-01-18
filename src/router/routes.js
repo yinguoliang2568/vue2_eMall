@@ -10,7 +10,8 @@ export default [
         name: "Register",
     },
     {
-        path: "/Search",
+        // 因为不一定有params参数，所所以使用？
+        path: "/Search/:keyword?",
         component: () =>
             import ("@/views/Search"),
         name: "Search",

@@ -43,17 +43,15 @@
               type="text"
               id="autocomplete"
               class="input-error input-xxlarge"
+              v-model="keyword"
             />
-            <router-link
-              to="/search"
-              class="sui-btn btn-xlarge btn-danger"
-              tag="button"
-              >搜索</router-link
-            >
-            <!-- <button
+            <button
               class="sui-btn btn-xlarge btn-danger"
               type="button"
-            ></button> -->
+              @click="toSearch"
+            >
+              搜索
+            </button>
           </form>
         </div>
       </div>
@@ -64,6 +62,25 @@
 <script>
   export default {
     name: "Header",
+    data() {
+      return {
+        keyword: "",
+      };
+    },
+    methods: {
+      toSearch() {
+        const { query } = this.$route;
+        this.$router.push({
+          name: "Search",
+          // 在params参数里面，属性不能是空字符串
+          params: {
+            keyword: this.keyword || null,
+          },
+          // 点击的时候确保都有参数
+          query,
+        });
+      },
+    },
   };
 </script>
 
