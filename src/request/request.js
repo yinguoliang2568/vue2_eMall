@@ -1,5 +1,5 @@
 import axios from "axios";
-console.log(process.env, "process.env");
+// console.log(process.env, "process.env");
 // 创建axios实例
 const request = axios.create({
     baseURL: process.env.VUE_APP_API,
