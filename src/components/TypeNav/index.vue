@@ -1,27 +1,28 @@
 <template>
   <div class="type-nav">
     <div class="container">
-      <div @mouseenter="mouseIsNav = true" @mouseleave="mouseIsNav = false">
+      <!-- 当鼠标在三级列表中和全部分类的的时候，需要三级列表都显示。所以把三级列表和全部分类装进一个div中 -->
+      <div @mouseenter="mouseInNav = true" @mouseleave="mouseInNav = false">
         <h2 class="all">全部商品分类</h2>
         <div
           class="sort"
-          @mouseenter="mouseInCategoryFlag = true"
-          @mouseleave="mouseInCategoryFlag = false"
-          v-show="isShow"
+          @mouseenter="catagoryInItem = true"
+          @mouseleave="catagoryInItem = false"
+          v-show="isNavShow"
         >
-          <div class="all-sort-list2" @mouseleave="mouseInCategoryIndex = -1">
+          <div class="all-sort-list2" @mouseleave="catagoryEnterIndex = -1">
             <div
               class="item"
-              v-for="(category1, index) in category1List"
+              v-for="(category1, index) in cateGory1List"
               :key="category1.id"
-              @mouseenter="getCategory23Throttle(category1.id, index)"
-              :class="{ active: mouseInCategoryIndex === index }"
+              @mouseenter="EnterIndexThrottle(index, category1.id)"
+              :class="{ active: catagoryEnterIndex === index }"
               @click="toSearch"
             >
               <h3>
                 <a
-                  :data-category1id="category1.id"
-                  :data-categoryname="category1.name"
+                  :data-categroy1id="category1.id"
+                  :data-categroyname="category1.name"
                   >{{ category1.name }}</a
                 >
               </h3>
@@ -34,8 +35,8 @@
                   >
                     <dt>
                       <a
-                        :data-category2id="category2.id"
-                        :data-categoryname="category2.name"
+                        :data-categroy2id="category2.id"
+                        :data-categroyname="category2.name"
                         >{{ category2.name }}</a
                       >
                     </dt>
@@ -45,8 +46,8 @@
                         :key="category3.id"
                       >
                         <a
-                          :data-category3id="category3.id"
-                          :data-categoryname="category3.name"
+                          :data-categroy3id="category3.id"
+                          :data-categroyname="category3.name"
                           >{{ category3.name }}</a
                         >
                       </em>
@@ -69,72 +70,83 @@
         <a href="###">有趣</a>
         <a href="###">秒杀</a>
       </nav>
+      <!-- 判断鼠标是否还在三级分类里面 -->
     </div>
   </div>
 </template>
 
 <script>
-  import { mapActions, mapState } from "vuex";
+  import { mapState, mapActions } from "vuex";
+  // 映入lodash里面的节流函数，用于控制鼠标移入三级分类列表
   import { throttle } from "lodash";
   export default {
     name: "TypeNav",
     data() {
       return {
-        // 鼠标移入移除
-        mouseInCategoryIndex: -1,
-        // 鼠标是否在三级分类列表中
-        mouseInCategoryFlag: false,
-        // 是否在nav中
-        mouseIsNav: false,
+        // 判断鼠标移入的下标
+        catagoryEnterIndex: -1,
+
+        // 判断鼠标是否还在三级分类中.
+        catagoryInItem: false,
+
+        // 判断鼠标是否还在三级分类nav中.
+        mouseInNav: false,
       };
     },
     computed: {
-      ...mapState("category", ["category1List"]),
-      isShow() {
+      ...mapState("Category", ["cateGory1List"]),
+      // 判断三级分类列表是否展示
+      isNavShow() {
         if (this.$route.name === "Home") return true;
-        return this.mouseIsNav;
+        return this.mouseInNav;
       },
     },
     methods: {
-      // 获取一级分类的数据
-      ...mapActions("category", ["getCategory1List", "getCategory2List"]),
-      getCategory2Index(id, index) {
-        //如果鼠标已经移出，就不要再执行获取数据的请求了。
-        if (!this.mouseInCategoryFlag) return;
+      ...mapActions("Category", ["getCategory1List", "getCategory2List"]),
 
-        this.mouseInCategoryIndex = index;
+      // 当鼠标移入的时候，需要修改catagoryEnterIndex的值为当前移入元素的下标
+      EnterIndex(index, id) {
+        // 取反就是鼠标已经移出，如果鼠标已经移出三级分类，那么就不会再触发请求
+        if (!this.catagoryInItem) return;
+        this.catagoryEnterIndex = index;
         this.getCategory2List(id);
       },
-      // 节流函数占位，起到一个响应式的作用
-      getCategory23Throttle() {},
-
-      // 跳转
+      //节流函数占位
+      EnterIndexThrottle() {},
+      // 路由到search页面
+      // 通过data-给标签加上自定义属性，然后通过dataset获取
       toSearch(e) {
-        const { category1id, category2id, category3id, categoryname } =
+        const { categroy1id, categroy2id, categroy3id, categroyname } =
           e.target.dataset;
         this.$router.push({
+          // 用name不用path，因为params用不了path
           name: "Search",
           query: {
-            category1id,
-            category2id,
-            category3id,
-            categoryname,
+            categroy1id: categroy1id,
+            categroy2id: categroy2id,
+            categroy3id: categroy3id,
+            categroyname: categroyname,
           },
         });
       },
     },
     mounted() {
-      // 获取一级分类的数据
       this.getCategory1List();
-      // 我们需要执行节流函数返回的函数。
-      // [options.leading=true] (boolean): 指定调用在节流开始前。
-      // [options.trailing=true] (boolean): 指定调用在节流结束后。
-      this.getCategory23Throttle = throttle(this.getCategory2Index, 200, {
-        // 鼠标移入后是否立即执行第一次
+      // 节流函数触发的是节流函数的返回值，在节流函数里面使用call来替换this指向和触发实际要触发的函数
+      // this.EnterIndexThrottle就是返回的函数，我们要触发的就是这个函数
+
+      // leading=true: 指定调用在节流开始前。用来控制第一次的函数是否调用
+      // trailing=true: 指定调用在节流结束后。用来控制最后一次的函数是否调用
+      this.EnterIndexThrottle = throttle(this.EnterIndex, 200, {
         leading: false,
-        // 鼠标移出后是否还执行最后一次节流时间为接受的。
         trailing: true,
       });
+    },
+    watch: {
+      // 当路由变化的时候，隐藏nav，显示搜索页面。不需要每次鼠标移出才把nav页面隐藏起来
+      $route() {
+        this.mouseInNav = false;
+      },
     },
   };
 </script>
@@ -248,7 +260,6 @@
                 }
               }
             }
-
             // &:hover {
             //   .item-list {
             //     display: block;

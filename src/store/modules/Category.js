@@ -1,67 +1,69 @@
+import {
+    reqCategory1List,
+    reqCategory2List,
+    reqCategory3List,
+} from "../../api";
 import Vue from "vue";
-import { req_Catagory1List, req_Catagory2List, req_Catagory3List } from "@/api";
+
 const state = {
-    category1List: [],
+    // 定义一个一级分类列表
+    cateGory1List: [],
 };
 const mutations = {
-    // 设置一级分类列表数据
-    setCategory1List(state, paylode) {
-        state.category1List = paylode.category1List;
-        // 给一级分类数据每个添加一个children属性
-        state.category1List.forEach((item) => {
-            // 普通对象添加属性那个属性不会是响应式属性，我们需要使用Vue.set()方法去添加。
+    // 1，修改一级分类列表数据
+    set_Category1List(state, paylode) {
+        state.cateGory1List = paylode.cateGory1List;
+        // 给cateGory1List里面的所有相添加一个具有响应式的children属性。
+        state.cateGory1List.forEach((item) => {
             Vue.set(item, "children", []);
         });
     },
-
-    // 设置二级分类列表数据
-    setCategory2List(state, paylode) {
-        // 通过index下标进行确定每个result即二级分类列表，把值赋值给一级的children属性。
-        state.category1List[paylode.nowCategoryIndex].children = paylode.result;
+    // 修改二级分类列表
+    set_Category2List(state, paylode) {
+        state.cateGory1List.forEach((item) => {
+            // 根据id判断需要给哪个数据添加数据
+            if (item.id === paylode.category1Id) {
+                item.children = paylode.cateGory2List;
+            }
+        });
     },
 };
 const actions = {
-    // 获取一级分类数据
-    async getCategory1List({ commit }) {
-        const result = await req_Catagory1List();
-        //
-        commit("setCategory1List", { category1List: result });
+    // 1,获取一级分类列表数据
+    async getCategory1List(store) {
+        const result = await reqCategory1List();
+        // console.log(store.reqCategory1List, "action-store");
+        // console.log(result, "actions");
+        store.commit("set_Category1List", { cateGory1List: result });
     },
-
-    // 获取二级分类数据，后面参数category1Id需要根据点击触发传参的数值来看是普通数据还是对象。
+    // 判断一级是否有二级分类的一级分类数据
     async getCategory2List({ commit, state }, category1Id) {
-        // 找到当前点击的数据，查看当前点击的数据是否已经有了children数据
-        const nowCategory = state.category1List.find((item) => {
+        const nowCateGory = state.cateGory1List.find((item) => {
             return item.id === category1Id;
         });
-        // console.log(nowCategory, "nowCategory");
-        // 获取当前点击的数据的下标
-        const nowCategoryIndex = state.category1List.findIndex((item) => {
-            return item.id === category1Id;
-        });
-        // 判断数据中是否有children属性有数据，不再请求
-        if (nowCategory.children.length !== 0) return;
+        if (nowCateGory.children.length !== 0) return;
+        const result = await reqCategory2List(category1Id);
 
-        //获取到的二级分类列表数据
+        // 设置一个数组用来存放三级请求回来的promise实例
+        const reqArr = [];
 
-        const result = await req_Catagory2List(category1Id);
-        // console.log(result, "result2");
-        // 按照二级分类数据获取每个二类数据的三级分类数据，并放在children属性上
-        const category3Arr = [];
         result.forEach((item) => {
-            const category3Item = req_Catagory3List(item.id);
-            category3Arr.push(category3Item);
+            const categroy3Promis = reqCategory3List(item.id);
+            // 将所有的实例放入数组中
+            reqArr.push(categroy3Promis);
+        });
+        // console.log(reqArr, "reqArr");
+        // all是如果数组里面返回到promise实例都是成功的，才会返回一个成功的实例，值就是所有成功promise实例组成的数组
+        // 使用awiat进行异步管理你，只有所有的promise都成功了，才会执行下面的代码
+        const category3Result = await Promise.all(reqArr);
+        // console.log(category3Result, "eeeeee");
+
+        // 因为reqArr数组是按照result的顺序进行添加到数组里面，所以三级分类和二级分类的index是对应的
+        category3Result.forEach((item, index) => {
+            result[index].children = item;
         });
 
-        // 利用Promise.all进行多并发使用
-        const category3List = await Promise.all(category3Arr);
-
-        // 将三级列表的数据赋值给二级分类的children属性上
-        // 因为每个三级和二级的都是一一对应的，所以直接index就行
-        result.forEach((item, index) => {
-            item.children = category3List[index];
-        });
-        commit("setCategory2List", { result, nowCategoryIndex });
+        commit("set_Category2List", { cateGory2List: result, category1Id });
     },
 };
 const getters = {};

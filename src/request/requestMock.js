@@ -1,32 +1,32 @@
 import axios from "axios";
 // console.log(process.env, "process.env");
-// 创建axios实例
 const request = axios.create({
     baseURL: "",
     timeout: 5000,
-    headers: {},
+    header: {},
 });
 
-//设置axios实例的请求拦截器属性
 request.interceptors.request.use((config) => {
-    //
+    /*
+1,一般每次请求的时候都要进度条的时候，那么久写在请求拦截器里面
+2，如果是每次切换路由的话，那么久写在路由守卫里面
+*/
     return config;
 });
-
-//设置axios实例的响应拦截器实现
 request.interceptors.response.use(
     (res) => {
+        // console.log(res, "res");
+        // 这个要和后端沟通，判断如果成功请求，但是不是我们要的数据的时候，给我返回一个提示。一般是200或者20000
         if (res.data.code !== 200 && res.data.code !== 20000) {
             alert(res.data.message);
-            //因为error的值就是一个对象，其中里面有个属性message代表着一些问题信息。为了保持一致，我们就需要同样返回一个对象，其中对象里面需要有message属性
+
             return Promise.reject({ message: res.data.message });
         } else {
             return res.data.data;
         }
     },
-    (error) => {
-        return Promise.reject(error);
+    (err) => {
+        return Promise.reject(err);
     }
 );
-
 export default request;

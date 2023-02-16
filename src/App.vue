@@ -2,7 +2,8 @@
   <div>
     <Header></Header>
     <router-view></router-view>
-    <Footer></Footer>
+    <hr />
+    <Footer v-if="footerIsShow"></Footer>
   </div>
 </template>
 
@@ -12,12 +13,18 @@
   export default {
     name: "App",
     components: { Header, Footer },
+    // mounted() {
+    //   console.log(this);
+    // },
+    // updated() {
+    //   console.log(this, 222);
+    // },
+    computed: {
+      footerIsShow() {
+        return !this.$route.meta.footIsHidden;
+      },
+    },
   };
 </script>
 
-<style lang="less" scoped>
-  // vue里面内置了less包，只需要下载less-loader包就行
-  .box {
-    font-size: 100px;
-  }
-</style>
+<style></style>

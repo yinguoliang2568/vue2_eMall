@@ -5,7 +5,15 @@
     <Recommend></Recommend>
     <Rank></Rank>
     <Like></Like>
-    <Floor v-for="floor in floorList" :key="floor.id" :floor="floor"></Floor>
+    <!-- 
+      1,因为有多个floor，且floor是在Home进行展示的，所以我们需要在Home里面获取数据
+      2,floor需要传参过去，我们直接将floor直接传值过去
+   -->
+    <Floor
+      v-for="floor in mockFloorList"
+      :key="floor.id"
+      :floor="floor"
+    ></Floor>
     <Brand></Brand>
   </div>
 </template>
@@ -17,12 +25,12 @@
   import List from "./List";
   import Rank from "./Rank";
   import Recommend from "./Recommend";
-  import { req_FloorList } from "@/api";
+  import { reqMockFloorList } from "@/api";
   export default {
     name: "Home",
     data() {
       return {
-        floorList: [],
+        mockFloorList: [],
       };
     },
     components: {
@@ -34,13 +42,14 @@
       Recommend,
     },
     methods: {
-      async getFloorList() {
-        const result = await req_FloorList();
-        this.floorList = result;
+      async getMockFloorList() {
+        const result = await reqMockFloorList();
+        this.mockFloorList = result;
+        console.log(result, "floor");
       },
     },
     mounted() {
-      this.getFloorList();
+      this.getMockFloorList();
     },
   };
 </script>

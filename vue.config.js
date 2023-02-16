@@ -1,33 +1,30 @@
 const { defineConfig } = require("@vue/cli-service");
 module.exports = defineConfig({
-    // babel会忽略node_modules里面的代码，你可以启用本选项，以避免构建后的代码中出现未转译的第三方依赖。false是关闭
-    transpileDependencies: false,
+    lintOnSave: false, //关闭eslint检查
+    // 默认情况下 babel-loader 会忽略所有 node_modules中的文件
+    transpileDependencies: false, // 配置devServer
     devServer: {
-        // 自动开启浏览器
+        // 自动打开浏览器配置
         open: true,
-        // 地址n
+        // 配置ip
         host: "127.0.0.1",
-        // 端口
-        port: 8888,
-        // 是否压缩服务器
-        compress: true,
-        // 配置代理
+        // 配置端口号
+        port: 8980,
         proxy: {
             "/dev-api": {
-                // 目标地址
+                // 目标服务器地址
                 target: "http://gmall-h5-api.atguigu.cn/",
-                // 是否开启WEBSTOCKET协议
-                // ws: false,
-                // 是否在跨域的时候将请求的源换成目标地址，这样目标就会换行
+                // 是否开启webStock协议
+                ws: true,
+                // 是否在跨域的时候，把请求的地址改为目标地址（一般写true），这样目标地址就会放行
                 changeOrigin: true,
-                // 如果需要代理，需要把请求地址的前缀替换（前缀的作用只是为了找到代理）
+                // 如果去请求代理，则把请求地址的前缀替换（前缀的作用只是找到对应的代理）
                 pathRewrite: {
                     "^/dev-api": "",
                 },
             },
         },
     },
-    // 用来的配置路径别名
     configureWebpack: {
         resolve: {
             alias: {

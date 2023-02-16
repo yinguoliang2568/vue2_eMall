@@ -1,0 +1,23 @@
+[
+  {
+    "consignee": "老李",
+    "deliveryAddress": "武汉市东湖高新区东湖网谷6号楼4楼",
+    "id": "1234",
+    "isDefault": "1",
+    "consigneeTel": "13250202045"
+  },
+  {
+    "consignee": "陈伟",
+    "deliveryAddress": "武汉市洪山区锦绣龙城D区",
+    "id": "2234",
+    "isDefault": "0",
+    "consigneeTel": "15885858585"
+  },
+  {
+    "consignee": "余维海",
+    "deliveryAddress": "武汉市汉阳区至尊SPA888号房",
+    "id": "3234",
+    "isDefault": "0",
+    "consigneeTel": "1888888888"
+  }
+]
